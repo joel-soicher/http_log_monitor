@@ -33,9 +33,9 @@ func (s *Section) AddRequest(req *Request) {
 func (s *Section) Compute() {
 }
 
-func (s *Section) DisplayString() string {
+func (s *Section) Display(d Displayer) {
 	if len(s.sections) == 0 {
-		return ""
+		return
 	}
 
 	// Temporary map used to switch key and value for sorting
@@ -59,7 +59,7 @@ func (s *Section) DisplayString() string {
 		result[len(tmpKeys)-i-1] = tmp[k] + "(" + strconv.FormatInt(int64(k), 10) + ")"
 	}
 
-	return "MostHits sections: " + strings.Join(result, ",")
+	d.Display("MostHits sections: " + strings.Join(result, ","))
 }
 
 func (s *Section) Flush() {

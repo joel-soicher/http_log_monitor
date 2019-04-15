@@ -6,10 +6,10 @@ import (
 )
 
 // Receives all read lines, parses them and finally displays the results
-// Improvement: Use a new struct Displayer in charge of the display
 type Recorder struct {
-	cfg      *Config
-	checkers []Checker
+	cfg       *Config
+	displayer Displayer
+	checkers  []Checker
 }
 
 // Parses a line and sends the result to all checkers
@@ -21,8 +21,10 @@ func (r *Recorder) AddLine(line string) {
 }
 
 // Flush checkers when display is done
-func (r *Recorder) Flush() {
+func (r *Recorder) Do() {
 	for _, c := range r.checkers {
+		c.Compute()
+		c.Display(r.displayer)
 		c.Flush()
 	}
 }
@@ -37,21 +39,15 @@ func (r *Recorder) Record(c <-chan string) {
 			r.AddLine(msg)
 		case <-recorderTicker.C:
 			// End of a tick: we need to compute the results and display them
-			fmt.Println("Collected data at", time.Now().Format("02/Jan/2006:15:04:05 -0700"))
-			for _, c := range r.checkers {
-				c.Compute()
-				if s := c.DisplayString(); len(s) > 0 {
-					fmt.Println(s)
-				}
-			}
-			fmt.Println("-------------------------")
-			fmt.Println("")
-			r.Flush()
+			header := fmt.Sprintf("Collected data at %s:\n", time.Now().Format("02/Jan/2006:15:04:05 -0700"))
+			r.displayer.Display(header)
+			r.Do()
+			r.displayer.Display("-------------------------\n")
 		}
 	}
 }
 
-func NewRecorder(cfg *Config) *Recorder {
+func NewRecorder(cfg *Config, displayer Displayer) *Recorder {
 	checkers := []Checker{
 		&InvalidChecker{},
 		&OkChecker{},
@@ -60,7 +56,8 @@ func NewRecorder(cfg *Config) *Recorder {
 		NewAlerter(cfg, &AlertsImpl{}),
 	}
 	return &Recorder{
-		cfg:      cfg,
-		checkers: checkers,
+		cfg:       cfg,
+		displayer: displayer,
+		checkers:  checkers,
 	}
 }

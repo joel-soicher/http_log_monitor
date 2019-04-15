@@ -108,8 +108,9 @@ func (a *Alerter) updateIndex() {
 	a.counts[a.index] = 0
 }
 
-func (a *Alerter) DisplayString() string {
-	return a.alerts.DisplayAlerts()
+func (a *Alerter) Display(d Displayer) {
+	d.Display("\nAlerts:")
+	d.Display(a.alerts.DisplayAlerts())
 }
 
 func (a *Alerter) Flush() {

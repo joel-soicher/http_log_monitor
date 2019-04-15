@@ -22,3 +22,11 @@ func TestParser(t *testing.T) {
 		t.Error()
 	}
 }
+
+func TestParserInvalid(t *testing.T) {
+	const s = "invalid string"
+	r := Parse(s)
+	if r.Valid {
+		t.Error()
+	}
+}

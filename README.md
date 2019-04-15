@@ -68,7 +68,7 @@ $ go test
 - I have not tested the library used for tailing the file, I don't know if it is efficient enough
 - The alerting system is based on a number of ticks. It should be based on real time.
 - Decouple computation and display, because the DisplayString methods do more than display by now.
-- The displayer should be abstract, in order to redirect to different outputs (console, file, network, ...)
+- Add different displayers, in order to redirect to different outputs (console, file, network, ...)
 - Add many more checkers, add a way to externally customize them and selecting the ones you want to activate.
 - Benchmark to identify potential bottlenecks, and optimize these parts
 - Read other log formats and improve the parsing

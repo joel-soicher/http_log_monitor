@@ -9,19 +9,21 @@ import (
 type Checker interface {
 	AddRequest(req *Request)
 	Compute()
-	DisplayString() string
+	Display(d Displayer)
 	Flush()
 }
 
 // Checker that will count the number of invalid lines in the file
 type InvalidChecker struct {
 	count int64
+	hit   bool
 }
 
 func (c *InvalidChecker) AddRequest(req *Request) {
 	if req == nil {
 		return
 	}
+	c.hit = true
 	if !req.Valid {
 		c.count++
 	}
@@ -30,23 +32,28 @@ func (c *InvalidChecker) AddRequest(req *Request) {
 func (c *InvalidChecker) Compute() {
 }
 
-func (c *InvalidChecker) DisplayString() string {
-	return "Invalid lines: " + strconv.FormatInt(c.count, 10)
+func (c *InvalidChecker) Display(d Displayer) {
+	if c.hit {
+		d.Display(fmt.Sprintf("Invalid lines: %v", strconv.FormatInt(c.count, 10)))
+	}
 }
 
 func (c *InvalidChecker) Flush() {
 	c.count = 0
+	c.hit = false
 }
 
 // Checker that will count the number of request with 200 status
 type OkChecker struct {
 	count int64
+	hit   bool
 }
 
 func (c *OkChecker) AddRequest(req *Request) {
 	if req == nil {
 		return
 	}
+	c.hit = true
 	if req.Status == 200 {
 		c.count++
 	}
@@ -55,12 +62,15 @@ func (c *OkChecker) AddRequest(req *Request) {
 func (c *OkChecker) Compute() {
 }
 
-func (c *OkChecker) DisplayString() string {
-	return "200 Status: " + strconv.FormatInt(c.count, 10)
+func (c *OkChecker) Display(d Displayer) {
+	if c.hit {
+		d.Display(fmt.Sprintf("200 Status: %v", strconv.FormatInt(c.count, 10)))
+	}
 }
 
 func (c *OkChecker) Flush() {
 	c.count = 0
+	c.hit = false
 }
 
 // Checker that will compute min, max and average size of requests
@@ -95,12 +105,12 @@ func (c *SizeChecker) AddRequest(req *Request) {
 func (c *SizeChecker) Compute() {
 }
 
-func (c *SizeChecker) DisplayString() string {
+func (c *SizeChecker) Display(d Displayer) {
 	if c.count == 0 {
-		return ""
+		return
 	}
 	avg := float64(c.total) / float64(c.count)
-	return fmt.Sprintf("Average request size:  %.2f (min: %v, max: %v)", avg, c.min, c.max)
+	d.Display(fmt.Sprintf("Average request size:  %.2f (min: %v, max: %v)", avg, c.min, c.max))
 }
 
 func (c *SizeChecker) Flush() {

@@ -57,8 +57,11 @@ func main() {
 	// Channel receiving the read lines
 	msgChan := make(chan string)
 
+	// Create the console Displayer
+	displayer := &ConsoleDisplayer{}
+
 	// Creates the recorder and launch it in a go routine
-	recorder := NewRecorder(cfg)
+	recorder := NewRecorder(cfg, displayer)
 	go recorder.Record(msgChan)
 
 	// Reads the file
