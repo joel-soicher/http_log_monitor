@@ -45,21 +45,30 @@ $ ./http_log_monitor --file="/home/user/myfolder/myfile.log" --tick=2 --alert=5 
 ```
 
 ## Tests
-For manual testing, I have a simple application for writing file to the log file that I change according my needs.
+For manual testing, I have a simple application for writing file to the log file that I change according to my needs.
 It is located in src/tester and you can launch it simply by running, assuming you are in that folder:
-
 ```sh
 $ go run main.go
+```
+
+Go tests can be launched by this command, assuming you are in the src/http_log_monitor/ folder:
+```sh
+$ go test
 ```
 
 ## Improvements
  All of these cannot be done due to lack of time...
 - Add more tests!!!
+- Test with real data (a lot of sample files can be found on the web)
+- Make different packages.
 - Better error management, logs the potential errors
 - Better dependency management (dep, glide, modules, ...)
 - Use a Text-UI based library for a better user experience
 - I have not tested the library used for tailing the file, I don't know if it is efficient enough
 - The alerting system is based on a number of ticks. It should be based on real time.
-- Add a Displayer struct
-- Add more checkers
+- Decouple computation and display, because the DisplayString methods do more than display by now.
+- The displayer should be abstract, in order to redirect to different outputs (console, file, network, ...)
+- Add many more checkers, add a way to externally customize them and selecting the ones you want to activate.
+- Benchmark to identify potential bottlenecks, and optimize these parts
+- Read other log formats and improve the parsing
 - Add more tests!!!
