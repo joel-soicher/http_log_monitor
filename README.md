@@ -33,6 +33,7 @@ Note: without arguments or an existing /tmp/access.log file, a panic will occur
 - tick : the number of seconds between two displays (default: 10s)
 - alert : the number of ticks representing the period in which an alert can be triggered (default :12 -> 120s with a 10s tick)
 - maxreq : the number of requests per second above which an alert will be triggered (default: 10)
+- maxsections: the maximum number of most hit sections to be displayed (default: 10)
 
 examples:
 
