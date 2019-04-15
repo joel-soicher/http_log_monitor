@@ -13,6 +13,7 @@ func main() {
 	tick := flag.Int("tick", 10, "number of seconds between two displays")
 	alertDelay := flag.Int("alert", 12, "number of ticks in which alert can be triggered")
 	maxReq := flag.Int("maxreq", 10, "max number of request per second")
+	maxSections := flag.Int("maxsections", 10, "Maximum number of most hit sections to be displayed")
 
 	flag.Parse()
 
@@ -32,10 +33,15 @@ func main() {
 		panic("invalid maxreq param")
 	}
 
+	if maxSections == nil {
+		panic("invalid maxsections param")
+	}
+
 	cfg := &Config{
-		Tick:       *tick,
-		AlertDelay: *alertDelay,
-		MaxReq:     *maxReq,
+		Tick:        *tick,
+		AlertDelay:  *alertDelay,
+		MaxReq:      *maxReq,
+		MaxSections: *maxSections,
 	}
 
 	// Channel to exit cleanly
