@@ -40,7 +40,9 @@ func (r *Recorder) Record(c <-chan string) {
 			fmt.Println("Collected data at", time.Now().Format("02/Jan/2006:15:04:05 -0700"))
 			for _, c := range r.checkers {
 				c.Compute()
-				fmt.Println(c.DisplayString())
+				if s := c.DisplayString(); len(s) > 0 {
+					fmt.Println(s)
+				}
 			}
 			fmt.Println("")
 			r.Flush()
@@ -52,7 +54,8 @@ func NewRecorder(cfg *Config) *Recorder {
 	checkers := []Checker{
 		&InvalidChecker{},
 		&OkChecker{},
-		NewAlerter(cfg),
+		NewSection(cfg),
+		NewAlerter(cfg, &AlertsImpl{}),
 	}
 	return &Recorder{
 		cfg:      cfg,

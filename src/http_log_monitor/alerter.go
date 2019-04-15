@@ -10,6 +10,12 @@ type Alert interface {
 	DisplayAlert() string
 }
 
+type Alerts interface {
+	Trigger(hits float64)
+	Untrigger()
+	DisplayAlerts() string
+}
+
 // Defines a alert activation event (extends Alert)
 type AlertActivation struct {
 	hits float64
@@ -29,19 +35,41 @@ func (a *AlertDeactivation) DisplayAlert() string {
 	return fmt.Sprintf("Alert recovered at %s\n", a.date)
 }
 
+// Contains the alerts and implement Alerts interface
+type AlertsImpl struct {
+	alerts []Alert
+}
+
+func (a *AlertsImpl) Trigger(hits float64) {
+	a.alerts = append(a.alerts, &AlertActivation{hits: hits, date: time.Now().Format("02/Jan/2006:15:04:05 -0700")})
+}
+
+func (a *AlertsImpl) Untrigger() {
+	a.alerts = append(a.alerts, &AlertDeactivation{date: time.Now().Format("02/Jan/2006:15:04:05 -0700")})
+}
+
+func (a *AlertsImpl) DisplayAlerts() string {
+	var ret string
+	for _, alert := range a.alerts {
+		ret += alert.DisplayAlert()
+	}
+	return ret
+}
+
 // Checks if alerts must be triggered or untriggered (extends Checker)
 type Alerter struct {
 	cfg       *Config
+	alerts    Alerts
 	counts    []int
-	alerts    []Alert
 	index     int
 	alerted   bool
 	firstPass bool
 }
 
-func NewAlerter(cfg *Config) *Alerter {
+func NewAlerter(cfg *Config, alerts Alerts) *Alerter {
 	return &Alerter{
 		cfg:       cfg,
+		alerts:    alerts,
 		counts:    make([]int, cfg.AlertDelay),
 		firstPass: true,
 	}
@@ -57,12 +85,12 @@ func (a *Alerter) Compute() {
 	avg := a.computeAverage()
 	if avg >= float64(a.cfg.MaxReq) {
 		if !a.alerted {
-			a.alerts = append(a.alerts, &AlertActivation{hits: avg, date: time.Now().Format("02/Jan/2006:15:04:05 -0700")})
+			a.alerts.Trigger(avg)
 		}
 		a.alerted = true
 	} else {
 		if a.alerted {
-			a.alerts = append(a.alerts, &AlertDeactivation{date: time.Now().Format("02/Jan/2006:15:04:05 -0700")})
+			a.alerts.Untrigger()
 
 		}
 		a.alerted = false
@@ -81,11 +109,7 @@ func (a *Alerter) updateIndex() {
 }
 
 func (a *Alerter) DisplayString() string {
-	var ret string
-	for _, alert := range a.alerts {
-		ret += alert.DisplayAlert()
-	}
-	return ret
+	return a.alerts.DisplayAlerts()
 }
 
 func (a *Alerter) Flush() {
