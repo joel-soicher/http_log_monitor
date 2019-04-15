@@ -3,7 +3,7 @@
 Implementation of an HTTP log monitoring console program.
 
 note: There's a misinterpretation in the subject for the default file that could be either /tmp/access.log or /var/log/access.log.
-I have choosen /tmp/access.log as default.
+I have chosen /tmp/access.log as default.
 
 ## Install and run
 

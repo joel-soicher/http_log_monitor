@@ -44,6 +44,7 @@ func (r *Recorder) Record(c <-chan string) {
 					fmt.Println(s)
 				}
 			}
+			fmt.Println("-------------------------")
 			fmt.Println("")
 			r.Flush()
 		}
@@ -55,6 +56,7 @@ func NewRecorder(cfg *Config) *Recorder {
 		&InvalidChecker{},
 		&OkChecker{},
 		NewSection(cfg),
+		NewSizeChecker(),
 		NewAlerter(cfg, &AlertsImpl{}),
 	}
 	return &Recorder{
